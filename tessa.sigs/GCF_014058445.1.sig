@@ -1,0 +1,1 @@
+/home/ntpierce/sourmash_databases/output.gtdb-databases/genomic/signatures/GCF_014058445.1.sig

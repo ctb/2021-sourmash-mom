@@ -1,0 +1,1 @@
+/home/ntpierce/sourmash_databases/output.gtdb-databases/genomic/signatures/GCF_902386875.1.sig
