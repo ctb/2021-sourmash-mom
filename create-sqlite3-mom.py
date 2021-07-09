@@ -3,6 +3,8 @@
 Create a sqlite3 database that contains a manifest-of-manifests.
 """
 import sys
+import os
+import pathlib
 import sqlite3
 import argparse
 import sourmash
@@ -13,7 +15,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument('sqlite_db')
     p.add_argument('--from-file')
-    p.add_argument('sigs_or_dbs', nargs='*')
+    p.add_argument('dirlist', nargs='*')
     args = p.parse_args()
     db = sqlite3.connect(args.sqlite_db)
 
@@ -42,22 +44,37 @@ def main():
         # already exists?
         print('table exists! not creating.')
 
-    sigs_or_dbs = list(args.sigs_or_dbs)
+    dirlist = list(args.dirlist)
     if args.from_file:
         with open(args.from_file) as fp:
             lines = [ x.strip() for x in fp ]
-            sigs_or_dbs.extend(lines)
+            dirlist.extend(lines)
 
-    if not sigs_or_dbs:
-        print('ERROR: no sigs or dbs?')
+    if not dirlist:
+        print('ERROR: no dirlist?')
         sys.exit(-1)
 
+    for filename in dirlist:
+        if not os.path.isdir(filename):
+            print(f"ERROR: '{filename}' is not a directory.")
+            sys.exit(-1)
+
+    # pull in all .sig, .sig.gz, and .zip filenames
+    file_list = []
+    for dirname in dirlist:
+        p = pathlib.Path(dirname)
+        file_list.extend(p.glob('**/*.sig'))
+        file_list.extend(p.glob('**/*.sig.gz'))
+        file_list.extend(p.glob('**/*.zip'))
+
+    # load each filename individually as an index
     index_locations = []
     manifests = []
-    for location in sigs_or_dbs:
-        idx = sourmash.load_file_as_index(location)
-        assert idx.manifest, (location, idx)
-        index_locations.append(location)
+    for path in file_list:
+        filename = str(path)
+        idx = sourmash.load_file_as_index(filename)
+        assert idx.manifest, (filename, idx)
+        index_locations.append(filename)
         manifests.append(idx.manifest)
 
     print(f'loaded {len(index_locations)} index locations')
