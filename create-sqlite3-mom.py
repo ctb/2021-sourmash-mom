@@ -71,6 +71,7 @@ def main():
     index_locations = []
     manifests = []
     for path in file_list:
+        print('path:', path)
         filename = str(path)
         idx = sourmash.load_file_as_index(filename)
         assert idx.manifest, (filename, idx)

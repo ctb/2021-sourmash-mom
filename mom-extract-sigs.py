@@ -47,17 +47,22 @@ def main():
 
     n = 0
     # for every manifest-of-manifest,
+
+    already_saved = set()
     for mom in moms:
         # get the index locations,
         for idx_location, manifest in mom.index_locations_and_manifests():
             idx = LazyLoadedIndex(idx_location, manifest)
+            #idx = idx.select(picklist=picklist, ksize=ksize, moltype=moltype)
 
             # and pull out all signatures in the manifest,
             for ss in idx.signatures():
-                # and save!
-                assert ss in picklist
-                save_sigs.add(ss)
-                n += 1
+                # check it matches our identifier list...
+                if ss in picklist and ss.md5sum() not in already_saved:
+                    # and save!
+                    save_sigs.add(ss)
+                    already_saved.add(ss.md5sum())
+                    n += 1
 
                 if n % 10 == 0:
                     print(f'...{n} signatures of {sum_matches} saved.')
