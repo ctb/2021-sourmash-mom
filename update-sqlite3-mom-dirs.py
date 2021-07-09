@@ -1,3 +1,4 @@
+#! /usr/bin/env python
 """
 update a sqlite3 database that contains a manifest-of-manifests built from
 a list of directories.
