@@ -39,12 +39,15 @@ Now, use the picklist of identifiers in `idents.csv` to extract the
 sigs you care about:
 
 ```
-./mom-get-locations.py --picklist idents.csv:ident:identprefix *.db \
+./mom-extract-sigs.py --picklist idents.csv:ident:identprefix *.db \
        -k 31 -o save.zip
 ```
 
 This loads all the moms, does rapid and efficient selection on them using
 the picklists, and then loads _just_ the data necessary to give you the
-signatures that match.
+signatures that match. And (of course :) you can save 'em however you want;
+here, it's a zip file with a manifest, but it uses the
+[standard sourmash output argument style](https://sourmash.readthedocs.io/en/latest/command-line.html#saving-signatures-more-generally).
 
-(Note that moltype and ksize selectors are not necessary, here.)
+(Note that moltype and ksize selectors work as expected, but are not
+necessary.)
