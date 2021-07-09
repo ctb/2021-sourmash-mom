@@ -51,3 +51,14 @@ here, it's a zip file with a manifest, but it uses the
 
 (Note that moltype and ksize selectors work as expected, but are not
 necessary.)
+
+## TODO
+
+Do we want to abspath the index locations? We should at least provide
+the option.
+
+Implement ways to update MoMs, so that we don't need to completely
+regenerate the database each time for large collections. For really
+large collections, this could be split into "update chunked zip files"
+(...slow?)  and then "update from directory containing chunks" which
+would be fast.
