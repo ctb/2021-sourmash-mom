@@ -73,14 +73,17 @@ def main():
     index_locations = []
     manifests = []
     
-    for path in file_list:
-        print('loading from:', path, end='\r')
+    for file_n, path in enumerate(file_list):
+        print(f"Loading sourmash index from '{path}' (file {file_n} of {len(file_list)})", end='\r')
         filename = str(path)
         if args.abspath:
             filename = str(path.resolve())
         start_time = time.time()
         try:
             idx = sourmash.load_file_as_index(filename)
+        except KeyboardInterrupt:
+            print(f"\nCTRL-C received; exiting.")
+            sys.exit(-1)
         except:
             print(f"ERROR loading from {filename}; skipping.")
             continue
@@ -92,7 +95,7 @@ def main():
             sys.exit(-1)
         else:
             diff_time = end_time - start_time
-            print(f"Loaded {len(idx.manifest)} signatures from {filename} ({diff_time:.2f}s)")
+            print(f"Loaded {len(idx.manifest)} sourmash signatures from '{path}' ({diff_time:.2f}s)")
         
         index_locations.append(filename)
         manifests.append(idx.manifest)
