@@ -9,6 +9,7 @@ import sqlite3
 import argparse
 import sourmash
 from sourmash.manifest import ManifestOfManifests
+import time
 
 
 def main():
@@ -16,6 +17,7 @@ def main():
     p.add_argument('sqlite_db')
     p.add_argument('--from-file')
     p.add_argument('dirlist', nargs='*')
+    p.add_argument('--abspath', action='store_true')
     args = p.parse_args()
     db = sqlite3.connect(args.sqlite_db)
 
@@ -70,17 +72,35 @@ def main():
     # load each filename individually as an index
     index_locations = []
     manifests = []
+    
     for path in file_list:
-        print('path:', path)
+        print('loading from:', path, end='\r')
         filename = str(path)
-        idx = sourmash.load_file_as_index(filename)
-        assert idx.manifest, (filename, idx)
+        if args.abspath:
+            filename = str(path.resolve())
+        start_time = time.time()
+        try:
+            idx = sourmash.load_file_as_index(filename)
+        except:
+            print(f"ERROR loading from {filename}; skipping.")
+            continue
+
+        end_time = time.time()
+
+        if not idx.manifest:
+            print(f"ERROR loading from {filename}; no manifest. Exiting.")
+            sys.exit(-1)
+        else:
+            diff_time = end_time - start_time
+            print(f"Loaded {len(idx.manifest)} signatures from {filename} ({diff_time:.2f}s)")
+        
         index_locations.append(filename)
         manifests.append(idx.manifest)
 
-    print(f'loaded {len(index_locations)} index locations')
+    print("")
+    print(f'Finished loading{len(index_locations)} index locations.')
     mom = ManifestOfManifests(index_locations, manifests)
-    print(f'len {len(mom)} signatures total')
+    print(f'Got {len(mom)} signatures.')
 
     for l, m in mom.index_locations_and_manifests():
         for row in m.rows:
@@ -91,7 +111,7 @@ def main():
 
     cursor.execute('SELECT COUNT(DISTINCT md5) from manifest')
     count, = cursor.fetchone()
-    print(f'{count} distinct rows total')
+    print(f'There are now {count} distinct md5 hashes in database')
 
 if __name__ == '__main__':
     sys.exit(main())
