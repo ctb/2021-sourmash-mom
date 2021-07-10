@@ -22,6 +22,9 @@ def main():
 
     ksize = args.ksize
     moltype = sourmash_args.calculate_moltype(args)
+    if not (args.ksize or moltype):
+        print("NOTE: no ksize/moltype selector given. Are you sure?")
+
     picklist = sourmash_args.load_picklist(args)
 
     # load one or more manifests of manifests, and select on them by picklist
@@ -30,12 +33,11 @@ def main():
     for db in args.dblist:
         print(f"Loading MoM sqlite database {db}...")
         nrows = ManifestOfManifests.nrows(db)
-        print(f"{db} contains {nrows} rows total. Selecting ksize/moltype/picklist...")
+        print(f"{db} contains {nrows} rows total. Running select......")
         start_time = time.time()
         mom = ManifestOfManifests.load_from_sqlite(db, ksize=ksize,
                                                    moltype=moltype,
                                                    picklist=picklist)
-        #print(f"...got {len(mom)} signatures. Now selecting...")
         end_time = time.time()
         diff_time = end_time - start_time
         print(f"...{len(mom)} matches remaining for '{db}' ({diff_time:.1f}s)")
