@@ -30,7 +30,9 @@ def main():
     for db in args.dblist:
         print(f"Loading database {db}...")
         start_time = time.time()
-        mom = ManifestOfManifests.load_from_sqlite(db)
+        mom = ManifestOfManifests.load_from_sqlite(db, ksize=ksize,
+                                                   moltype=moltype,
+                                                   picklist=picklist)
         print(f"...got {len(mom)} signatures. Now selecting...")
         mom = mom.select_to_manifest(ksize=ksize, moltype=moltype,
                                      picklist=picklist)
