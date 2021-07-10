@@ -47,10 +47,10 @@ def main():
     distinct = set()
     for idx_location, manifest in mom.index_locations_and_manifests():
         for row in manifest.rows:
-            tup = (row['internal_location'], row['md5'])
-            print(tup)
+            tup = (row['name'], row['md5'])
             distinct.add(tup)
     print(f"XXX {len(distinct)}")
+    num_distinct = len(distinct)
 
     # report on picklist matches - this is where things would exit
     # if --picklist-require-all was set.
@@ -61,7 +61,7 @@ def main():
         sys.exit(0)
 
     print("---")
-    print(f"Now extracting {sum_matches} signatures to '{args.output}'")
+    print(f"Now extracting {num_distinct} signatures to '{args.output}'")
 
     # save sigs to args.output -
     save_sigs = sourmash_args.SaveSignaturesToLocation(args.output)
@@ -78,17 +78,18 @@ def main():
 
             # and pull out all signatures in the manifest,
             for ss in idx.signatures():
-                # check it matches our identifier list...
-                if ss in picklist and ss.md5sum() not in already_saved:
+                # check it matches our identifier list and is not a dup:
+                tup = (ss.name, ss.md5sum())
+                if ss in picklist and tup not in already_saved:
                     # and save!
                     save_sigs.add(ss)
-                    already_saved.add(ss.md5sum())
+                    already_saved.add(tup)
                     n += 1
 
                 if n % 10 == 0:
-                    print(f'\33[2K...{n} signatures of {sum_matches} saved.', end="\r")
+                    print(f'\33[2K...{n} signatures of {num_distinct} saved.', end="\r")
 
-    print(f'...{n} signatures of {sum_matches} saved.')
+    print(f'...{n} signatures of {num_distinct} saved.')
 
 if __name__ == '__main__':
     main()
