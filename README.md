@@ -54,11 +54,6 @@ necessary.)
 
 ## TODO
 
-Do we want to abspath the locations of the indexes? We should at least
-provide the option on creation.
-
-Also, provide default dedup on md5sum?
-
 Implement ways to update MoMs, so that we don't need to completely
 regenerate the database each time for large collections. For really
 large collections, this could be split into "update chunked zip files"
