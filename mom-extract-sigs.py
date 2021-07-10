@@ -34,8 +34,6 @@ def main():
                                                    moltype=moltype,
                                                    picklist=picklist)
         #print(f"...got {len(mom)} signatures. Now selecting...")
-        #mom = mom.select_to_manifest(ksize=ksize, moltype=moltype,
-        #                             picklist=picklist)
         end_time = time.time()
         diff_time = end_time - start_time
         print(f"...{len(mom)} matches remaining for '{db}' ({diff_time:.1f}s)")
@@ -44,6 +42,15 @@ def main():
         moms.append(mom)
 
     print(f"loaded {sum_matches} rows from {len(moms)} databases.")
+
+    # CTB XXX
+    distinct = set()
+    for idx_location, manifest in mom.index_locations_and_manifests():
+        for row in manifest.rows:
+            tup = (row['internal_location'], row['md5'])
+            print(tup)
+            distinct.add(tup)
+    print(f"XXX {len(distinct)}")
 
     # report on picklist matches - this is where things would exit
     # if --picklist-require-all was set.
@@ -68,7 +75,6 @@ def main():
         # get the index locations,
         for idx_location, manifest in mom.index_locations_and_manifests():
             idx = LazyLoadedIndex(idx_location, manifest)
-            #idx = idx.select(picklist=picklist, ksize=ksize, moltype=moltype)
 
             # and pull out all signatures in the manifest,
             for ss in idx.signatures():
