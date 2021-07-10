@@ -53,10 +53,11 @@ def main():
 
     # CTB
     distinct = set()
-    for idx_location, manifest in mom.index_locations_and_manifests():
-        for row in manifest.rows:
-            tup = (row['name'], row['md5'])
-            distinct.add(tup)
+    for mom in moms:
+        for idx_location, manifest in mom.index_locations_and_manifests():
+            for row in manifest.rows:
+                tup = (row['name'], row['md5'])
+                distinct.add(tup)
     print(f"There are {len(distinct)} distinct rows across all MoMs.")
     num_distinct = len(distinct)
 
