@@ -70,7 +70,7 @@ def main():
         for idx_location, manifest in mom.index_locations_and_manifests():
             prefix = args.output_prefix
             idx_base = os.path.basename(idx_location)
-            output_picklist = f"{prefix}.{idx_base}.csv"
+            output_picklist = f"{prefix}{idx_base}.csv"
 
             print('writing', output_picklist)
             with open(output_picklist, 'w', newline="") as fp:
