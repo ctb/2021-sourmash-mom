@@ -74,7 +74,7 @@ def main():
     manifests = []
     
     for file_n, path in enumerate(file_list):
-        print(f"Loading sourmash index from '{path}' (file {file_n} of {len(file_list)})", end='\r')
+        print(f"Loading index from '{path}' ({file_n+1} of {len(file_list)})", end='\r')
         filename = str(path)
         if args.abspath:
             filename = str(path.resolve())
@@ -95,7 +95,7 @@ def main():
             sys.exit(-1)
         else:
             diff_time = end_time - start_time
-            print(f"Loaded {len(idx.manifest)} sourmash signatures from '{path}' ({diff_time:.2f}s)")
+            print(f"\33[2KLoaded {len(idx.manifest)} signatures from '{path}' in {diff_time:.2f}s ({file_n+1} of {len(file_list)})")
         
         index_locations.append(filename)
         manifests.append(idx.manifest)
