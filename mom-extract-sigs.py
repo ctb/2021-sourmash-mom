@@ -28,20 +28,22 @@ def main():
     moms = []
     sum_matches = 0
     for db in args.dblist:
-        print(f"Loading database {db}...")
+        print(f"Loading MoM sqlite database {db}...")
         start_time = time.time()
         mom = ManifestOfManifests.load_from_sqlite(db, ksize=ksize,
                                                    moltype=moltype,
                                                    picklist=picklist)
-        print(f"...got {len(mom)} signatures. Now selecting...")
-        mom = mom.select_to_manifest(ksize=ksize, moltype=moltype,
-                                     picklist=picklist)
+        #print(f"...got {len(mom)} signatures. Now selecting...")
+        #mom = mom.select_to_manifest(ksize=ksize, moltype=moltype,
+        #                             picklist=picklist)
         end_time = time.time()
         diff_time = end_time - start_time
-        print(f"...{len(mom)} matches remaining. ({diff_time:.1f})")
+        print(f"...{len(mom)} matches remaining for '{db}' ({diff_time:.1f}s)")
 
         sum_matches += len(mom)
         moms.append(mom)
+
+    print(f"loaded {sum_matches} rows from {len(moms)} databases.")
 
     # report on picklist matches - this is where things would exit
     # if --picklist-require-all was set.
@@ -50,6 +52,9 @@ def main():
     if not args.output:
         print('No output options; exiting.', file=sys.stderr)
         sys.exit(0)
+
+    print("---")
+    print(f"Now extracting {sum_matches} signatures to '{args.output}'")
 
     # save sigs to args.output -
     save_sigs = sourmash_args.SaveSignaturesToLocation(args.output)
@@ -75,7 +80,7 @@ def main():
                     n += 1
 
                 if n % 10 == 0:
-                    print(f'...{n} signatures of {sum_matches} saved.')
+                    print(f'\33[2K...{n} signatures of {sum_matches} saved.', end="\r")
 
     print(f'...{n} signatures of {sum_matches} saved.')
 
