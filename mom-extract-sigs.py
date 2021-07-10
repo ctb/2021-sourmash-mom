@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 import sys
 import argparse
+import time
 
 import sourmash
 from sourmash import sourmash_args
@@ -27,9 +28,16 @@ def main():
     moms = []
     sum_matches = 0
     for db in args.dblist:
+        print(f"Loading database {db}...")
+        start_time = time.time()
         mom = ManifestOfManifests.load_from_sqlite(db)
+        print(f"...got {len(mom)} signatures. Now selecting...")
         mom = mom.select_to_manifest(ksize=ksize, moltype=moltype,
                                      picklist=picklist)
+        end_time = time.time()
+        diff_time = end_time - start_time
+        print(f"...{len(mom)} matches remaining. ({diff_time:.1f})")
+
         sum_matches += len(mom)
         moms.append(mom)
 

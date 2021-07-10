@@ -98,16 +98,18 @@ def main():
         manifests.append(idx.manifest)
 
     print("")
-    print(f'Finished loading{len(index_locations)} index locations.')
+    print(f'Finished loading {len(index_locations)} index locations.')
     mom = ManifestOfManifests(index_locations, manifests)
     print(f'Got {len(mom)} signatures.')
 
+    print("Saving...")
     for l, m in mom.index_locations_and_manifests():
         for row in m.rows:
             cursor.execute('INSERT INTO manifest (index_location, internal_location, md5, md5short, ksize, moltype, num, scaled, n_hashes, with_abundance, name, filename) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                            (l, row['internal_location'], row['md5'], row['md5short'], row['ksize'], row['moltype'], row['num'], row['scaled'], row['n_hashes'], row['with_abundance'], row['name'], row['filename']),)
 
         db.commit()
+    print("...done!")
 
     cursor.execute('SELECT COUNT(DISTINCT md5) from manifest')
     count, = cursor.fetchone()
