@@ -8,8 +8,10 @@ import pathlib
 import sqlite3
 import argparse
 import sourmash
-from sourmash.manifest import ManifestOfManifests
 import time
+
+
+from libmom import ManifestOfManifests
 
 
 def main():
@@ -82,7 +84,7 @@ def main():
         try:
             idx = sourmash.load_file_as_index(filename)
         except KeyboardInterrupt:
-            print(f"\nCTRL-C received; exiting.")
+            print("\nCTRL-C received; exiting.")
             sys.exit(-1)
         except:
             print(f"ERROR loading from {filename}; skipping.")

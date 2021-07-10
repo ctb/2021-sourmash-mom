@@ -3,12 +3,12 @@ import sys
 import argparse
 import time
 
-import sourmash
 from sourmash import sourmash_args
-from sourmash.manifest import ManifestOfManifests
-from sourmash.index import LazyMultiIndex, LazyLoadedIndex
+from sourmash.index import LazyLoadedIndex
 from sourmash.cli.utils import (add_ksize_arg, add_moltype_args,
                                 add_picklist_args)
+
+from libmom import ManifestOfManifests
 
 
 def main():
