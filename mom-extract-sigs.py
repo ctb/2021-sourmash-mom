@@ -29,6 +29,8 @@ def main():
     sum_matches = 0
     for db in args.dblist:
         print(f"Loading MoM sqlite database {db}...")
+        nrows = ManifestOfManifests.nrows(db)
+        print(f"{db} contains {nrows} rows total. Selecting ksize/moltype/picklist...")
         start_time = time.time()
         mom = ManifestOfManifests.load_from_sqlite(db, ksize=ksize,
                                                    moltype=moltype,
@@ -41,20 +43,22 @@ def main():
         sum_matches += len(mom)
         moms.append(mom)
 
-    print(f"loaded {sum_matches} rows from {len(moms)} databases.")
+    print("---")
 
-    # CTB XXX
+    print(f"loaded {sum_matches} rows total from {len(moms)} databases.")
+
+    # report on picklist matches - this is where things would exit
+    # if --picklist-require-all was set.
+    sourmash_args.report_picklist(args, picklist)
+
+    # CTB
     distinct = set()
     for idx_location, manifest in mom.index_locations_and_manifests():
         for row in manifest.rows:
             tup = (row['name'], row['md5'])
             distinct.add(tup)
-    print(f"XXX {len(distinct)}")
+    print(f"There are {len(distinct)} distinct rows across all MoMs.")
     num_distinct = len(distinct)
-
-    # report on picklist matches - this is where things would exit
-    # if --picklist-require-all was set.
-    sourmash_args.report_picklist(args, picklist)
 
     if not args.output:
         print('No output options; exiting.', file=sys.stderr)

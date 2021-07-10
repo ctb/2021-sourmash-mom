@@ -14,6 +14,17 @@ class ManifestOfManifests:
         return sum([ len(m) for m in self.manifests ])
 
     @classmethod
+    def nrows(cls, filename):
+        "Count total number of rows in this database, with no filtering."
+        import sqlite3
+        db = sqlite3.connect(filename)
+        cursor = db.cursor()
+        query = 'SELECT COUNT(md5) FROM manifest'
+        cursor.execute(query)
+        total_rows, = cursor.fetchone()
+        return total_rows
+
+    @classmethod
     def load_from_sqlite(cls, filename, *,
                          ksize=None, moltype=None, picklist=None):
         import sqlite3
