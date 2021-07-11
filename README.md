@@ -7,8 +7,7 @@ See [sourmash#1652](https://github.com/sourmash-bio/sourmash/issues/1652).
 You'll need to have the `add/manifest_lazy_sigfile` branch of sourmash
 installed
 ([PR sourmash#1619](https://github.com/sourmash-bio/sourmash/pull/1619))
-for the experimental code implementing (1) `class ManifestOfManifests`
-and (2) `LazyLoadedIndex`.
+for the experimental code implementing `LazyLoadedIndex`.
 
 ## Quickstart
 
