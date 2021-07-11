@@ -1,4 +1,7 @@
 #! /usr/bin/env python
+"""
+Generate picklists for individual indexes, based on ManifestofManifests.
+"""
 import sys
 import argparse
 import time
@@ -15,22 +18,19 @@ from libmom import ManifestOfManifests
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('query')
     p.add_argument('dblist', nargs='+')
     p.add_argument('--output-prefix')
     add_ksize_arg(p, 31)
     add_moltype_args(p)
+    add_picklist_args(p)
     args = p.parse_args()
 
+    ksize = args.ksize
     moltype = sourmash_args.calculate_moltype(args)
-    query = sourmash_args.load_query_signature(args.query,
-                                               ksize=args.ksize,
-                                               select_moltype=moltype)
-    notify('loaded query: {}... (k={}, {})', str(query)[:30],
-           query.minhash.ksize, query.minhash.moltype)
+    picklist = sourmash_args.load_picklist(args)
 
-    ksize = query.minhash.ksize
-    moltype = query.minhash.moltype
+    if not (args.ksize or moltype):
+        print("NOTE: no ksize/moltype/picklist selectors given. Are you sure?")
 
     # load one or more manifests of manifests, and select on them
     moms = []
@@ -41,31 +41,14 @@ def main():
         print(f"{db} contains {nrows} rows total. Running select......")
         start_time = time.time()
         mom = ManifestOfManifests.load_from_sqlite(db, ksize=ksize,
-                                                   moltype=moltype)
+                                                   moltype=moltype,
+                                                   picklist=picklist)
         end_time = time.time()
         diff_time = end_time - start_time
         print(f"...{len(mom)} matches remaining for '{db}' ({diff_time:.1f}s)")
 
         sum_matches += len(mom)
-        moms.append(mom)
 
-    print("---")
-
-    print(f"loaded {sum_matches} rows total from {len(moms)} databases.")
-
-    # CTB
-    distinct = set()
-    for mom in moms:
-        for idx_location, manifest in mom.index_locations_and_manifests():
-            for row in manifest.rows:
-                tup = (row['name'], row['md5'])
-                distinct.add(tup)
-    print(f"There are {len(distinct)} distinct rows across all MoMs.")
-    num_distinct = len(distinct)
-
-    print("---")
-
-    for mom in moms:
         # get the index locations,
         for idx_location, manifest in mom.index_locations_and_manifests():
             prefix = args.output_prefix
@@ -73,6 +56,7 @@ def main():
             output_picklist = f"{prefix}{idx_base}.csv"
 
             print('writing', output_picklist)
+            assert not os.path.exists(output_picklist)
             with open(output_picklist, 'w', newline="") as fp:
                 manifest.write_to_csv(fp, write_header=True)
 
