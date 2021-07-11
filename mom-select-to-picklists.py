@@ -19,7 +19,7 @@ from libmom import ManifestOfManifests
 def main():
     p = argparse.ArgumentParser()
     p.add_argument('dblist', nargs='+')
-    p.add_argument('--output-prefix')
+    p.add_argument('--output-prefix', default='')
     add_ksize_arg(p, 31)
     add_moltype_args(p)
     add_picklist_args(p)
