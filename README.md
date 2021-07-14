@@ -4,10 +4,8 @@ This is an early stage dev repo to explore betters ways of doing
 database building, by using manifests of manifests and picklists.
 See [sourmash#1652](https://github.com/sourmash-bio/sourmash/issues/1652).
 
-You'll need to have the `add/manifest_lazy_sigfile` branch of sourmash
-installed
-([PR sourmash#1619](https://github.com/sourmash-bio/sourmash/pull/1619))
-for the experimental code implementing `LazyLoadedIndex`.
+You'll need to have the `latest` branch of sourmash
+installed (or sourmash 4.2.1, once it's released).
 
 ## Quickstart
 
@@ -15,7 +13,7 @@ for the experimental code implementing `LazyLoadedIndex`.
 
 First, create a manifest-of-manifests ('mom') from a directory with zip files:
 ```
-./create-mom.py wort.db ./wort.zips/
+./mom-create.py ./wort.zips/ -o wort-test.db
 ```
 This mimics the situation where you have some really big zip files containing
 signatures calculated by e.g. wort.  As output, `wort.db` will contain the
@@ -23,7 +21,7 @@ mom.
 
 Second, create another mom DB 
 ```
-./create-mom.py tessa.db ./tessa.sigs/
+./mom-create.py ./tessa.sigs/ -o tessa.db
 ```
 from a directory containing a pile of signatures. This mimics the
 situation where there are a bunch of ancillary signatures that are
@@ -38,8 +36,8 @@ Now, use the picklist of identifiers in `idents.csv` to extract the
 sigs you care about:
 
 ```
-./mom-extract-sigs.py --picklist idents.csv:ident:identprefix *.db \
-       -k 31 -o save.zip
+./mom-extract-sigs.py --picklist idents.csv:ident:identprefix \
+       wort-test.db tessa.db -k 31 -o save.zip
 ```
 
 This loads all the moms, does rapid and efficient selection on them using

@@ -16,12 +16,15 @@ from libmom import ManifestOfManifests
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('sqlite_db')
-    p.add_argument('--from-file')
     p.add_argument('dirlist', nargs='*')
-    p.add_argument('--abspath', action='store_true')
+    p.add_argument('--from-file',
+                   help="a file containing a list of directories to scan")
+    p.add_argument('-o', '--output', required=True,
+                   help="output mom database")
+    p.add_argument('--abspath', action='store_true',
+                   help="resolve relative paths to absolute before storing")
     args = p.parse_args()
-    db = sqlite3.connect(args.sqlite_db)
+    db = sqlite3.connect(args.output)
 
     cursor = db.cursor()
     try:
