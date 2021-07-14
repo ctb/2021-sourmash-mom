@@ -2,6 +2,7 @@
 import sys
 import argparse
 import time
+import csv
 
 from sourmash import sourmash_args
 from sourmash.index import LazyLoadedIndex
@@ -15,6 +16,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument('dblist', nargs='+')
     p.add_argument('-o', '--output', default=None)
+    p.add_argument('--save-unmatched-pickset')
     add_ksize_arg(p, 31)
     add_moltype_args(p)
     add_picklist_args(p)
@@ -51,6 +53,16 @@ def main():
 
     # report on picklist matches - this is where things would exit
     # if --picklist-require-all was set.
+    if picklist and args.save_unmatched_pickset:
+        unfound = picklist.pickset - picklist.found
+
+        with open(args.save_unmatched_pickset, "w", newline="") as fp:
+            w = csv.writer(fp)
+            w.writerow(["unmatched"])
+            for v in unfound:
+                w.writerow([v])
+        print(f"Wrote {len(unfound)} unmatched values from picklist to '{args.save_unmatched_pickset}'", file=sys.stderr)
+
     sourmash_args.report_picklist(args, picklist)
 
     # CTB
